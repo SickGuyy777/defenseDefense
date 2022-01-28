@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class Path : MonoBehaviour
 {
+    private bool initialized;
     public PathFile reference;
 
     private List<Vector2> _points;
@@ -21,14 +22,15 @@ public class Path : MonoBehaviour
             List<Vector3> pointsV3 = new();
             value.ForEach(p => pointsV3.Add(p));
 
+            if (!initialized)
+                Initialize(Array.Empty<Vector2>());
+            
             line.positionCount = pointsV3.Count;
             line.SetPositions(pointsV3.ToArray());
         }
     }
 
     private LineRenderer line;
-    
-    private void OnEnable() => Initialize(Array.Empty<Vector2>());
 
     /// <summary>
     /// Initialize the path
@@ -40,6 +42,8 @@ public class Path : MonoBehaviour
 
         transform.position = Vector2.zero;
         Points = positions.ToList();
+
+        initialized = true;
     }
 
     /// <summary>

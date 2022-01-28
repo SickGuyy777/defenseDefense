@@ -12,17 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43d39d8fd6ab4a13ae525ba4d4d5bd4d, type: 3}
   m_Name: Test Path
   m_EditorClassIdentifier: 
-  data: 'start -3.5 3
+  data: 'start -3 3
 
-    line 3 3
+    line 0 1
 
-    line 3 0
-
-    line -3 0
-
-    line -3 -3
-
-    line
-    3.5 -3
+    line 2 -3
 
     end'
