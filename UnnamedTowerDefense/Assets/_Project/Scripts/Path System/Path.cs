@@ -23,7 +23,10 @@ public class Path : MonoBehaviour
             value.ForEach(p => pointsV3.Add(p));
 
             if (!initialized)
-                Initialize(Array.Empty<Vector2>());
+            {
+                Initialize(value);
+                return;
+            }
             
             line.positionCount = pointsV3.Count;
             line.SetPositions(pointsV3.ToArray());
@@ -39,11 +42,10 @@ public class Path : MonoBehaviour
     private void Initialize(IEnumerable<Vector2> positions)
     {
         line = GetComponent<LineRenderer>();
+        initialized = true;
 
         transform.position = Vector2.zero;
         Points = positions.ToList();
-
-        initialized = true;
     }
 
     /// <summary>
