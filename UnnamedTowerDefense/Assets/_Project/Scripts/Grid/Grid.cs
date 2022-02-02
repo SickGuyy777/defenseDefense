@@ -7,6 +7,8 @@ public class Grid<T> : MonoBehaviour where T : Cell
     [SerializeField] protected int width;
     [SerializeField] protected int height;
 
+    public virtual Vector2 FromGridPosition(Vector2Int gridPosition) { return Vector2.zero; }
+    
     public T[,] Cells { get; protected set; }
 
     protected virtual void OnStart()
