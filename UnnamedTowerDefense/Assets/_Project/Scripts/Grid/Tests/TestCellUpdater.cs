@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
 
-namespace _Project.Scripts.Grid
+namespace _Project.Scripts.Grid.Tests
 {
-    public class CellUpdater : MonoBehaviour
+    [AddComponentMenu("Tests/Grid/Cell Updater")]
+    public class TestCellUpdater : MonoBehaviour
     {
         public event Action OnClick;
         public event Action OnHover;

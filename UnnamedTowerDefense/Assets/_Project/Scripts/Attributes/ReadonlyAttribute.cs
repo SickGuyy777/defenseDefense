@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Project.Scripts.Grid
+namespace _Project.Scripts.Attributes
 {
     public class ReadonlyAttribute : PropertyAttribute { }
 }

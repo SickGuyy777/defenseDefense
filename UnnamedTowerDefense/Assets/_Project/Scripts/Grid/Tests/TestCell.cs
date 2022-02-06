@@ -1,21 +1,22 @@
-using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations;
 using Object = UnityEngine.Object;
+using CellUpdater = _Project.Scripts.Grid.Tests.TestCellUpdater;
 
-namespace _Project.Scripts.Grid
+namespace _Project.Scripts.Grid.Tests
 {
-    [Serializable]
-    public class ObjectCell : Cell
+    public class TestCell : Cell
     {
-        public delegate void ObjectCellEvent(ObjectCell objectCell);
-
-        public event ObjectCellEvent OnClicked;
+        private const string CellSpritePath = "Assets/_Project/Sprites/Grid/Cell/Temp/Cell Placeholder.png";
         
-        public Grid<ObjectCell> Parent { get; private set; }
+        public delegate void TestCellEvent(TestCell objectCell);
+        public event TestCellEvent OnClicked;
+        
+        public Grid<TestCell> Parent { get; private set; }
         public Vector2Int GridPosition { get; private set; }
         public Vector2 WorldPosition { get; private set; }
+        
 
         private GameObject _occupier;
         public GameObject Occupier
@@ -31,6 +32,7 @@ namespace _Project.Scripts.Grid
             }
         }
 
+        
         private CellUpdater placeHolder;
         private SpriteRenderer renderer;
 
@@ -67,12 +69,10 @@ namespace _Project.Scripts.Grid
         public float HorizontalSpace { get; private set; }
         public float VerticalSpace { get; private set; }
 
-        private new void Initialize(params object[] parameters) => throw new NotImplementedException();
-
-        public void Initialize(int x, int y, float horizontalSpace, float verticalSpace, Grid<ObjectCell> parent)
+        public void Initialize(int x, int y, float horizontalSpace, float verticalSpace, Grid<TestCell> parent)
             => Initialize(new Vector2Int(x, y), horizontalSpace, verticalSpace, parent);
 
-        public void Initialize(Vector2Int position, float horizontalSpace, float verticalSpace, Grid<ObjectCell> parent)
+        public void Initialize(Vector2Int position, float horizontalSpace, float verticalSpace, Grid<TestCell> parent)
         {
             HorizontalSpace = horizontalSpace;
             VerticalSpace = verticalSpace;
@@ -93,7 +93,7 @@ namespace _Project.Scripts.Grid
             placeHolder.transform.SetParent(parent.transform);
             renderer = placeHolder.spriteRenderer;
 
-            var sprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_Project/Sprites/Grid/Cell/Cell Placeholder.png");
+            var sprite = GetCellSprite();
             renderer.sprite = sprite;
             
             placeHolder.SetAlpha(0);
@@ -103,14 +103,17 @@ namespace _Project.Scripts.Grid
             placeHolder.OnClick += () => OnClicked?.Invoke(this);
         }
 
-        public ObjectCell(int x, int y, float horizontalSpace, float verticalSpace, Grid<ObjectCell> parent) =>
+        public TestCell(int x, int y, float horizontalSpace, float verticalSpace, Grid<TestCell> parent) =>
                 Initialize(x, y, horizontalSpace, verticalSpace, parent);
-        public ObjectCell(Vector2Int position, float horizontalSpace, float verticalSpace, Grid<ObjectCell> parent) =>
+        public TestCell(Vector2Int position, float horizontalSpace, float verticalSpace, Grid<TestCell> parent) =>
                 Initialize(position, horizontalSpace, verticalSpace, parent);
 
         private void UpdatePlaceholder() => SetRed(IsOccupied ? 255 : 0);
 
-        private void SetRed(float r) => placeHolder.SetColor(new Color(r, 0, 0, 0.25f));
+        private void SetRed(float r, float a = 0.25f) => placeHolder.SetColor(new Color(r, 0, 0, a));
         private void SetAlpha(float a) => placeHolder.SetAlpha(a);
+        
+        private static Sprite GetCellSprite() =>
+                AssetDatabase.LoadAssetAtPath<Sprite>(CellSpritePath);
     }
 }
