@@ -1,4 +1,3 @@
-using System;
 using _Project.Scripts.Attributes;
 using UnityEditor;
 using UnityEngine;
@@ -23,17 +22,6 @@ namespace _Project.Scripts.Grid
         public WorldCell Cell { get; private set; }
         public SpriteRenderer Renderer { get; private set; }
         public BoxCollider2D Collider { get; private set; }
-
-        private bool _isHovered;
-        public bool IsHovered
-        {
-            get => _isHovered;
-            set
-            {
-                _isHovered = value;
-                SetAlpha(value ? 1 : 0);
-            }
-        }
 
         [Readonly]
         [SerializeField]
@@ -64,9 +52,6 @@ namespace _Project.Scripts.Grid
 
             // Set the collider's size
             Collider.size = new Vector2(transform.localScale.x / 2, transform.localScale.y);
-            
-            // Set the alpha value to 0
-            IsHovered = false;
         }
 
         /// <summary>
@@ -153,10 +138,10 @@ namespace _Project.Scripts.Grid
         /// <summary>
         /// Set my <see cref="Renderer"/>'s red color value.
         /// </summary>
-        /// <param name="red">The new red color value. Range: 0 - 255</param>
+        /// <param name="red">The new red color value. Range: 0 - 1</param>
         public void SetRed(float red)
         {
-            Assert.IsTrue(red is > 255 or < 0, "Invalid red color value.");
+            Assert.IsFalse(red is > 1 or < 0, "Invalid red color value.");
 
             var c = Renderer.color;
             Renderer.color = new Color(red, c.g, c.b, c.a);
@@ -165,10 +150,10 @@ namespace _Project.Scripts.Grid
         /// <summary>
         /// Set my <see cref="Renderer"/>'s green color value.
         /// </summary>
-        /// <param name="green">The new green color value. Range: 0 - 255</param>
+        /// <param name="green">The new green color value. Range: 0 - 1</param>
         public void SetGreen(float green)
         {
-            Assert.IsTrue(green is > 255 or < 0, "Invalid green color value.");
+            Assert.IsFalse(green is > 1 or < 0, "Invalid green color value.");
 
             var c = Renderer.color;
             Renderer.color = new Color(c.r, green, c.b, c.a);
@@ -177,10 +162,10 @@ namespace _Project.Scripts.Grid
         /// <summary>
         /// Set my <see cref="Renderer"/>'s blue color value.
         /// </summary>
-        /// <param name="blue">The new blue color value. Range: 0 - 255</param>
+        /// <param name="blue">The new blue color value. Range: 0 - 1</param>
         public void SetBlue(float blue)
         {
-            Assert.IsTrue(blue is > 255 or < 0, "Invalid blue color value.");
+            Assert.IsFalse(blue is > 1 or < 0, "Invalid blue color value.");
 
             var c = Renderer.color;
             Renderer.color = new Color(c.r, c.g, blue, c.a);

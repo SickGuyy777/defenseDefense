@@ -32,6 +32,9 @@ namespace _Project.Scripts.Grid
             WorldPosition = parent.FromGridPosition(gridPosition);
 
             Placeholder = WorldCellPlaceholder.New(this);
+            
+            // Set placeholder color to black
+            Renderer.color = new Color(0, 0, 0, 0f);
         }
     }
 }
