@@ -1,7 +1,8 @@
-using _Project.Scripts.Attributes;
+using System;
 using _Project.Scripts.Cursor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using _Project.Scripts.Grid.Hover_System;
 
 namespace _Project.Scripts.Grid
 {
@@ -34,8 +35,6 @@ namespace _Project.Scripts.Grid
         {
             // Assertions
             Assert.IsFalse(width <= 0 || height <= 0, "Cannot initialize grid - invalid dimensions.");
-
-            // TODO: If there are cells present, 'disable' them and clear the cells array to initialize a new set.
 
             UpdateSpacingAndOffset();
             Cells = new WorldCell[width, height];
@@ -74,6 +73,51 @@ namespace _Project.Scripts.Grid
             // Update offsets
             XOffset = width % 2 == 0 ? HorizontalSpacing / 2 : 0;
             YOffset = height % 2 == 0 ? VerticalSpacing / 2 : 0;
+        }
+
+        private WorldCell lastHovered;
+        private void Update()
+        {
+            var selected = GetClosest(Mouse.Position);
+
+            // Mouse is probably out of bounds
+            if (selected == null)
+                lastHovered?.Placeholder.SetAlpha(0);
+            else
+            {
+                var changedHovered = selected.WorldPosition != lastHovered?.WorldPosition;
+                
+                if (changedHovered)
+                    lastHovered?.Placeholder.SetAlpha(0);
+                
+                selected.Placeholder.SetAlpha(0.25f);
+            }
+
+            lastHovered = selected;
+        }
+
+        private WorldCell GetClosest(Vector2 position)
+        {
+            var distance = position - (Vector2)transform.position;
+            
+            // Position is out of bounds
+            if (Math.Abs(distance.x) > HorizontalSpacing * width / 2 ||
+                Math.Abs(distance.y) > VerticalSpacing * height / 2)
+                return null;
+
+            var horizontalBound = width / 2f;
+            var verticalBound = height / 2f;
+
+            var x = position.x / HorizontalSpacing;
+            var y = position.y / VerticalSpacing;
+            
+            var gridX = (int)(x + horizontalBound);
+            var gridY = (int)(y + verticalBound);
+            
+            // Validate the position
+            var inBound = gridX < width && gridX >= 0 && gridY < height && gridY >= 0;
+            
+            return inBound ? Cells[gridX, gridY] : null;
         }
     }
 }

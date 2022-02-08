@@ -51,7 +51,7 @@ namespace _Project.Scripts.Grid
             Renderer.sprite = DefaultSprite;
 
             // Set the collider's size
-            Collider.size = new Vector2(transform.localScale.x / 2, transform.localScale.y);
+            Collider.size = new Vector2(transform.localScale.x / grid.HorizontalSpacing, transform.localScale.y / grid.VerticalSpacing);
         }
 
         /// <summary>

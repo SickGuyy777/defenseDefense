@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class Grid<T> : MonoBehaviour where T : Cell
 {
+    public int Width => width;
+    public int Height => height;
+    
     [SerializeField] protected int width;
     [SerializeField] protected int height;
 
