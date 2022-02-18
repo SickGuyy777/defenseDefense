@@ -9,7 +9,7 @@ namespace _Project.Scripts.Attributes
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             // Store previous state
-            var previousGUIState = GUI.enabled;
+            bool previousGUIState = GUI.enabled;
             
             // Disable GUI
             GUI.enabled = false;
