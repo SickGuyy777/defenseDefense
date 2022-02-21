@@ -1,16 +1,12 @@
+using _Project.Scripts.Grid.Placeholders;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Project.Scripts.Grid
 {
-    public interface IPlaceable<TCell>
-        where TCell : ICell
-    {
-        void Place(TCell cell);
-    }
-    
-    public class Placeable<TCell> : MonoBehaviour, IPlaceable<TCell>
-        where TCell : ICell
+    public class Placeable<TCell, TGrid, TPlaceholder> : MonoBehaviour
+        where TCell : Cell<TGrid, TPlaceholder, TCell>
+        where TGrid : Grid<TCell, TPlaceholder, TGrid>
+        where TPlaceholder : CellPlaceholder<TCell, TGrid, TPlaceholder>
     {
         public SpriteRenderer Renderer { get; private set; }
         protected TCell Cell { get; private set; }
@@ -40,7 +36,5 @@ namespace _Project.Scripts.Grid
         }
 
         public void Release() => OnRelease();
-        
-        public enum Type { Default, Path }
     }
 }

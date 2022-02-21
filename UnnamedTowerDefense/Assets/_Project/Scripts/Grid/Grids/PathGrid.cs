@@ -1,12 +1,11 @@
+using System;
 using _Project.Scripts.Grid.Placeholders;
 using Unity.VisualScripting;
 using UnityEngine;
-using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
-using Exception = System.Exception;
 
 namespace _Project.Scripts.Grid
 {
-    public class PlaceableGrid : Grid<PlaceableCell, PlaceableCellPlaceholder, PlaceableGrid>
+    public class PathGrid : Grid<PathCell, PathPlaceholder, PathGrid>
     {
         // Initialize the grid
         protected override void OnStart() => Initialize();
@@ -18,13 +17,13 @@ namespace _Project.Scripts.Grid
                     new Exception());
 
             UpdateSpacingAndOffset();
-            Cells = new PlaceableCell[width, height];
+            Cells = new PathCell[width, height];
             
             for (var i = 0; i < width; i++)
             {
                 for (var j = 0; j < height; j++)
                 {
-                    Cells[i, j] = new PlaceableCell(this, new Vector2Int(i, j));
+                    Cells[i, j] = new PathCell(this, new Vector2Int(i, j));
                 }
             }
         }
@@ -37,12 +36,14 @@ namespace _Project.Scripts.Grid
             return new Vector2(x, y);
         }
 
-        public void Place(Vector2Int gridPos, Placeable<PlaceableCell> template)
+        public void Place<T>(Vector2Int gridPos, T template)
+            where T : Placeable<PathCell, PathGrid, PathPlaceholder>
         {
             if (gridPos.x < 0 || gridPos.y < 0 || gridPos.x >= width || gridPos.y >= height)
                 throw new ArgumentOutOfRangeException("X or Y position is out of range.", new Exception());
 
-            var ps = Cells[gridPos.x, gridPos.y].Placeholder.AddComponent<PlaceableSprite>();
+            var ps = Cells[gridPos.x, gridPos.y].Placeholder
+                .AddComponent<T>();
             ps.placeableSprite = template.placeableSprite;
             
             Cells[gridPos.x, gridPos.y].Place(ps);

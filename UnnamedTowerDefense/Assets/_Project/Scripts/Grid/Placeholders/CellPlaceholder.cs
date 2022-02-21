@@ -4,15 +4,10 @@ using UnityEngine;
 
 namespace _Project.Scripts.Grid.Placeholders
 {
-    public interface IPlaceHolder
-    {
-        public void Initialize<TCell>(TCell cell) where TCell : ICell;
-        public static TThis New<TThis>(ICell cell) where TThis : IPlaceHolder => default;
-    }
-    
-    public class CellPlaceholder<T, TThis> : MonoBehaviour, IPlaceHolder
-        where TThis : IPlaceHolder
-        where T : ICell
+    public class CellPlaceholder<TCell, TGrid, TThis> : MonoBehaviour
+        where TCell : Cell<TGrid, TThis, TCell>
+        where TGrid : Grid<TCell, TThis, TGrid>
+        where TThis : CellPlaceholder<TCell, TGrid, TThis>
     {
         public const string DefaultSpritePath = "Assets/_Project/Sprites/Grid/Cell/Cell Placeholder.png";
         
@@ -31,7 +26,7 @@ namespace _Project.Scripts.Grid.Placeholders
             }
         }
         
-        public static TThis New(T cell) => default;
+        public TCell Cell { get; protected set; }
 
         protected virtual void OnAwake() {}
 
@@ -48,7 +43,7 @@ namespace _Project.Scripts.Grid.Placeholders
             
             OnAwake();
         }
-        
+
         #region Renderer Color Controller
         /// <summary>
         /// Set my <see cref="Renderer"/>'s alpha value.
@@ -112,6 +107,7 @@ namespace _Project.Scripts.Grid.Placeholders
         private static Sprite GetDefaultSprite() => AssetDatabase.LoadAssetAtPath<Sprite>(DefaultSpritePath);
         #endregion
 
-        public void Initialize<TCell>(TCell cell) where TCell : ICell { }
+        public void Initialize(TCell cell) { }
+        public static TThis New(TCell cell) => default;
     }
 }

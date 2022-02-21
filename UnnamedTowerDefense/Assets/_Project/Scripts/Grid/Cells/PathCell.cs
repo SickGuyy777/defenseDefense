@@ -3,20 +3,13 @@ using UnityEngine;
 
 namespace _Project.Scripts.Grid
 {
-    public class PlaceableCell : Cell<PlaceableGrid, SpriteCellPlaceholder, PlaceableCell>
+    public class PathCell : Cell<PathGrid, PathPlaceholder, PathCell>
     {
         public SpriteRenderer Renderer => Placeholder.Renderer;
-
         private readonly Sprite startSprite;
+        
 
-
-        // Constructor
-        /// <summary>
-        /// Initialize a new <see cref="HoverableCell"/>.
-        /// </summary>
-        /// <param name="parent">The parent grid of the cell.</param>
-        /// <param name="gridPosition">The position in the parent grid.</param>
-        public PlaceableCell(PlaceableGrid parent, Vector2Int gridPosition) : base(parent, gridPosition)
+        public PathCell(PathGrid parent, Vector2Int gridPosition) : base(parent, gridPosition)
         {
             // Set placeholder color to black
             Renderer.color = new Color(255, 255, 255, 0f);
@@ -24,13 +17,13 @@ namespace _Project.Scripts.Grid
             
             startSprite = Renderer.sprite;
         }
-        
-        
+
+
         // Placing system
-        public Placeable<PlaceableCell, PlaceableGrid, SpriteCellPlaceholder> Placed { get; protected set; }
+        public Placeable<PathCell, PathGrid, PathPlaceholder> Placed { get; protected set; }
         public bool IsOccupied => Placed != null;
         
-        public void Place(Placeable<PlaceableCell, PlaceableGrid, SpriteCellPlaceholder> placeable)
+        public void Place(Placeable<PathCell, PathGrid, PathPlaceholder> placeable)
         {
             Release();
 
@@ -42,6 +35,7 @@ namespace _Project.Scripts.Grid
 
             Placeholder.Renderer.sprite = Placed.PlaceableSprite;
         }
+        
         public void Release()
         {
             if (Placed == null)
@@ -51,6 +45,18 @@ namespace _Project.Scripts.Grid
 
             Placed.Release();
             Placed = null;
+        }
+
+        public void Rotate(RotateDirection dir) => Placeholder.transform.rotation = GetRotation(dir);
+
+        private static Quaternion GetRotation(RotateDirection dir)
+        {
+            return Quaternion.Euler(Vector3.zero);
+        }
+
+        public enum RotateDirection
+        {
+            Right, Left
         }
     }
 }

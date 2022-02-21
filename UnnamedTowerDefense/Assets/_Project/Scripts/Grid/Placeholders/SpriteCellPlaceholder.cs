@@ -3,11 +3,9 @@ using UnityEngine;
 
 namespace _Project.Scripts.Grid.Placeholders
 {
-    public class PlaceableCellPlaceholder : CellPlaceholder<PlaceableCell, PlaceableCellPlaceholder>
+    public class SpriteCellPlaceholder : CellPlaceholder<PlaceableCell, PlaceableGrid, SpriteCellPlaceholder>
     {
         public new const string DefaultSpritePath = "Assets/_Project/Sprites/Grid/Cell/Cell Placeholder.png";
-        
-        public PlaceableCell Cell { get; private set; }
 
         [Readonly]
         private PlaceableGrid grid;
@@ -16,7 +14,7 @@ namespace _Project.Scripts.Grid.Placeholders
         /// Initialize the placeholder with <paramref name="cell"/>.
         /// </summary>
         /// <param name="cell">The reference <see cref="HoverableCell"/>.</param>
-        public void Initialize(PlaceableCell cell)
+        public new void Initialize(PlaceableCell cell)
         {
             // Assert if the cell is null
             if (cell == null)
@@ -43,7 +41,7 @@ namespace _Project.Scripts.Grid.Placeholders
         /// </summary>
         /// <param name="cell">The <see cref="HoverableCell"/> reference to create a <see cref="HoverableCellPlaceholder"/>.</param>
         /// <returns>The created <see cref="HoverableCellPlaceholder"/></returns>
-        public new static PlaceableCellPlaceholder New(PlaceableCell cell)
+        public new static SpriteCellPlaceholder New(PlaceableCell cell)
         {
             // Create a new object
             var go = new GameObject(string.Empty);
@@ -52,7 +50,7 @@ namespace _Project.Scripts.Grid.Placeholders
             go.SetActive(false);
             
             // Add the component
-            var placeholder = go.AddComponent<PlaceableCellPlaceholder>();
+            var placeholder = go.AddComponent<SpriteCellPlaceholder>();
             
             // Initialize before awake
             placeholder.Initialize(cell);

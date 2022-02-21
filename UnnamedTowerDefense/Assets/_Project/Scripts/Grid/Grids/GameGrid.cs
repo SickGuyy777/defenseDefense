@@ -8,32 +8,46 @@ namespace _Project.Scripts.Grid
     public class GameGrid : Grid<HoverableCell, HoverableCellPlaceholder, GameGrid>
     {
         // Grid properties
-        [SerializeField]
-        private List<PlaceableItem> prefabs;
-
+        [SerializeField] private List<PlaceableSpriteItem> spritePrefabs;
+        [SerializeField] private List<PathItem> pathPrefabs;
+        
         private int objIndex = -1;
+        private int pathIndex = -1;
 
         private PlaceableGrid placeableGrid;
+        private PathGrid pathGrid;
         
         [HideInInspector]
         public bool inEditMode;
+
+        private bool placingPath;
 
         
         // Initialize the grid
         protected override void OnStart()
         {
+            Debug.Log("START");
             placeableGrid = new GameObject("Placeable Grid", typeof(PlaceableGrid))
                     .GetComponent<PlaceableGrid>();
             
             placeableGrid.width = width;
             placeableGrid.height = height;
+
+            pathGrid = new GameObject("Path Grid", typeof(PathGrid)).GetComponent<PathGrid>();
+
+            pathGrid.width = width;
+            pathGrid.height = height;
             
             Initialize();
 
-            if (prefabs.Count == 0)
-                throw new System.Exception("Found no prefabs!"); 
+            if (spritePrefabs.Count == 0)
+                throw new System.Exception("Found no prefabs!");
 
+            if (pathPrefabs.Count == 0)
+                throw new System.Exception("Found no path prefabs!");
+            
             objIndex = 0;
+            pathIndex = 0;
         }
 
         private void Initialize()
@@ -73,9 +87,19 @@ namespace _Project.Scripts.Grid
         private HoverableCell lastHoveredCell;
         public void EditModeUpdate()
         {
-            bool switchPrefab = prefabs.Count > 0 && Input.GetKeyDown(KeyCode.H);
+            bool switchPrefab = (placingPath ? pathPrefabs.Count > 0 : spritePrefabs.Count > 0) &&
+                                Input.GetKeyDown(KeyCode.H);
             if (switchPrefab)
-                objIndex = objIndex == prefabs.Count - 1 ? 0 : objIndex + 1;
+            {
+                if (placingPath)
+                    pathIndex = pathIndex == pathPrefabs.Count - 1 ? 0 : pathIndex + 1;
+                else
+                    objIndex = objIndex == spritePrefabs.Count - 1 ? 0 : objIndex + 1;
+            }
+
+            bool switchPathMode = Input.GetKeyDown(KeyCode.P);
+            if (switchPathMode)
+                placingPath = !placingPath;
 
             HoverableCell lastHovered = lastHoveredCell;
             HoverableCell hovered = GetClosest(Mouse.Position);
@@ -85,27 +109,47 @@ namespace _Project.Scripts.Grid
                 return;
 
             Vector2Int gridPos = hovered.GridPosition;
-            var placed = placeableGrid.Cells[gridPos.x, gridPos.y].Placed;
-            bool notSamePlaced = !placed || placed.PlaceableSprite != prefabs[objIndex].Prefab.PlaceableSprite;
-            if (Input.GetMouseButtonDown(0))
+
+            bool notSamePlaced;
+            if (placingPath)
             {
-                if (notSamePlaced)
-                    placeableGrid.Place(gridPos, prefabs[objIndex].Prefab);
-                else
-                    placeableGrid.Release(gridPos);
+                var placed = pathGrid.Cells[gridPos.x, gridPos.y].Placed;
+                notSamePlaced = !placed || placed.placeableSprite != pathPrefabs[pathIndex].Preafb.PlaceableSprite;
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (notSamePlaced)
+                        pathGrid.Place(gridPos, pathPrefabs[pathIndex].Preafb);
+                    else
+                        pathGrid.Release(gridPos);
+                }
             }
+            else
+            {
+                var placed = placeableGrid.Cells[gridPos.x, gridPos.y].Placed;
+                notSamePlaced = !placed || placed.PlaceableSprite != spritePrefabs[objIndex].Prefab.PlaceableSprite;
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (notSamePlaced)
+                        placeableGrid.Place(gridPos, spritePrefabs[objIndex].Prefab);
+                    else
+                        placeableGrid.Release(gridPos);
+                }
             
-            if (hovered != lastHovered || switchPrefab) return;
+                if (hovered != lastHovered || switchPrefab) return;
+            }
             
             if (notSamePlaced)
             {
                 hovered.Placeholder.SetRed(1f);
                 hovered.Placeholder.SetGreen(1f);
                 hovered.Placeholder.SetBlue(1f);
-                hovered.SetSprite(prefabs[objIndex].Prefab.PlaceableSprite);
 
-                if (Input.GetMouseButtonDown(0))
-                    placeableGrid.Place(gridPos, prefabs[objIndex].Prefab);
+                Sprite hoverSprite = placingPath
+                    ? pathPrefabs[pathIndex].Preafb.PlaceableSprite
+                    : spritePrefabs[objIndex].Prefab.PlaceableSprite; 
+                
+                hovered.SetSprite(hoverSprite);
             }
             else
             {
@@ -113,9 +157,6 @@ namespace _Project.Scripts.Grid
                 hovered.Placeholder.SetGreen(0f);
                 hovered.Placeholder.SetBlue(0f);
                 hovered.ResetSprite();
-                
-                if (Input.GetMouseButtonDown(0))
-                    placeableGrid.Release(gridPos);
             }
 
             void SelectCell(HoverableCell selected)
@@ -148,19 +189,32 @@ namespace _Project.Scripts.Grid
             if (inEditMode)
             {
                 GUI.Label(new Rect(new Vector2(20, 20), new Vector2(150, 20)),
-                    "Placing: " + prefabs[objIndex].Name);
+                    "Placing: " + spritePrefabs[objIndex].Name);
             }
+            
+            GUI.Label(new Rect(new Vector2(20, 60), new Vector2(150, 20)),
+                $"{(placingPath ? string.Empty : "Not ")}Placing Path");
         }
         #endregion
         
         [System.Serializable]
-        private class PlaceableItem
+        private class PlaceableSpriteItem
         {
             [SerializeField] private string name;
             [SerializeField] private PlaceableSprite prefab;
             
             public string Name => name;
             public PlaceableSprite Prefab => prefab;
+        }
+
+        [System.Serializable]
+        private class PathItem
+        {
+            [SerializeField] private string name;
+            [SerializeField] private PlaceablePath prefab;
+
+            public string Name => name;
+            public PlaceablePath Preafb => prefab;
         }
     }
 }

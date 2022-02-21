@@ -1,64 +1,42 @@
+using _Project.Scripts.Attributes;
 using _Project.Scripts.Grid;
 using _Project.Scripts.Grid.Placeholders;
 using UnityEngine;
 
-public interface IGrid
+public class Grid<TCell, TPlaceHolder, TThis> : MonoBehaviour
+    where TPlaceHolder : CellPlaceholder<TCell, TThis, TPlaceHolder>
+    where TCell : Cell<TThis, TPlaceHolder, TCell>
+    where TThis : Grid<TCell, TPlaceHolder, TThis>
 {
-    public int Width { get; protected set; }
-    public int Height { get; protected set; }
 
-    public float HorizontalSpacing { get; set; }
-    public float VerticalSpacing { get; set; }
+    [Readonly]
+    public int width;
     
-    Vector2 FromGridPosition(Vector2Int gridPosition);
-}
-public class Grid<T, TPlaceHolder, TThis> : MonoBehaviour, IGrid
-    where TThis : IGrid
-    where T : Cell<TThis, TPlaceHolder, T>
-    where TPlaceHolder : IPlaceHolder
-{
-    int IGrid.Width
-    {
-        get => width;
-        set { }
-    }
-    int IGrid.Height
-    {
-        get => height;
-        set { }
-    }
-
-    [SerializeField] public int width;
-    [SerializeField] public int height;
+    [Readonly]
+    public int height;
     
     protected float horizontalSpacing;
+
     /// <summary>
     /// The width of one grid cell (in world units)
     /// </summary>
-    public float HorizontalSpacing
-    {
-        get => horizontalSpacing;
-        set {}
-    }
+    public float HorizontalSpacing => horizontalSpacing;
 
     protected float verticalSpacing;
+
     /// <summary>
     /// The height of one grid cell (in world units)
     /// </summary>
-    public float VerticalSpacing
-    {
-        get => verticalSpacing;
-        set {}
-    }
-        
+    public float VerticalSpacing => verticalSpacing;
+
     /// <summary>
     /// The horizontal offset of each cell (in world units)
     /// </summary>
-    protected float XOffset { get; set; }
+    public float XOffset { get; protected set; }
     /// <summary>
     /// The vertical offset of each cell (in world units)
     /// </summary>
-    protected float YOffset { get; set; }
+    public float YOffset { get; protected set; }
 
     public virtual Vector2 FromGridPosition(Vector2Int gridPosition) => Vector2.zero;
 
@@ -86,7 +64,7 @@ public class Grid<T, TPlaceHolder, TThis> : MonoBehaviour, IGrid
         YOffset = height % 2 == 0 ? VerticalSpacing / 2 : 0;
     }
     
-    protected virtual T GetClosest(Vector2 position)
+    protected virtual TCell GetClosest(Vector2 position)
     {
         Vector2 distance = position - (Vector2)transform.position;
             
@@ -110,11 +88,11 @@ public class Grid<T, TPlaceHolder, TThis> : MonoBehaviour, IGrid
         return inBound ? Cells[gridX, gridY] : null;
     }
     
-    public T[,] Cells { get; protected set; }
+    public TCell[,] Cells { get; protected set; }
 
     protected virtual void OnStart()
     {
-        Cells = new T[width, height];
+        Cells = new TCell[width, height];
 
         for (int i = 0; i < width; i++)
         {

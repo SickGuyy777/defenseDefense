@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2948484876386811198}
-  - component: {fileID: 7273399490580538298}
   - component: {fileID: -362496066484531856}
+  - component: {fileID: 4415407426089514488}
   m_Layer: 0
   m_Name: Path
   m_TagString: Untagged
@@ -33,20 +33,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7273399490580538298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2948484876386811197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2364432639e4891a19c46c8186c24dc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 1
-  placeableSprite: {fileID: 1200607952, guid: 840e15e6f43ce49178249c1b6d1e54e9, type: 3}
 --- !u!212 &-362496066484531856
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -99,3 +85,16 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4415407426089514488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2948484876386811197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e5b82402f9749f8ac9ae1cac920a609, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  placeableSprite: {fileID: 1200607952, guid: 840e15e6f43ce49178249c1b6d1e54e9, type: 3}
