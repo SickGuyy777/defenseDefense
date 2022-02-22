@@ -1,5 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 using _Project.Scripts.Cursor;
+using _Project.Scripts.Grid.Placeholders;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace _Project.Scripts.Grid
@@ -26,7 +29,6 @@ namespace _Project.Scripts.Grid
         // Initialize the grid
         protected override void OnStart()
         {
-            Debug.Log("START");
             placeableGrid = new GameObject("Placeable Grid", typeof(PlaceableGrid))
                     .GetComponent<PlaceableGrid>();
             
@@ -37,7 +39,7 @@ namespace _Project.Scripts.Grid
 
             pathGrid.width = width;
             pathGrid.height = height;
-            
+
             Initialize();
 
             if (spritePrefabs.Count == 0)
@@ -66,6 +68,14 @@ namespace _Project.Scripts.Grid
                     Cells[i, j] = new HoverableCell(this, new Vector2Int(i, j));
                 }
             }
+
+            StartCoroutine(SetDraggablePath());
+        }
+
+        private IEnumerator SetDraggablePath()
+        {
+            yield return new WaitUntil(() => pathGrid.Cells != null);
+            draggedPath = new PathCell(pathGrid, new Vector2Int(0, 0), pathGrid.Cells[0, 0].Placeholder);
         }
 
         public override Vector2 FromGridPosition(Vector2Int gridPosition)
@@ -85,6 +95,8 @@ namespace _Project.Scripts.Grid
         }
 
         private HoverableCell lastHoveredCell;
+        private PathCell draggedPath;
+        
         public void EditModeUpdate()
         {
             bool switchPrefab = (placingPath ? pathPrefabs.Count > 0 : spritePrefabs.Count > 0) &&
@@ -113,15 +125,37 @@ namespace _Project.Scripts.Grid
             bool notSamePlaced;
             if (placingPath)
             {
+                draggedPath.SetGridPosition(gridPos);
+
                 var placed = pathGrid.Cells[gridPos.x, gridPos.y].Placed;
                 notSamePlaced = !placed || placed.placeableSprite != pathPrefabs[pathIndex].Preafb.PlaceableSprite;
+
+                PathPlaceholder pathPlaceholder = GetPathPlaceholder();
+
+                draggedPath.SetPlaceholder(pathPlaceholder);
+                pathPlaceholder.CopyFromCell(draggedPath);
+                
+                if (Input.GetKeyDown(KeyCode.R))
+                    draggedPath.Rotate();
 
                 if (Input.GetMouseButtonDown(0))
                 {
                     if (notSamePlaced)
+                    {
                         pathGrid.Place(gridPos, pathPrefabs[pathIndex].Preafb);
+                        pathGrid.Cells[gridPos.x, gridPos.y].Placeholder.CopyFromCell(draggedPath);
+                    }
                     else
                         pathGrid.Release(gridPos);
+                }
+
+                PathPlaceholder GetPathPlaceholder()
+                {
+                    var result = hovered.Placeholder.GetComponent<PathPlaceholder>();
+
+                    if (!result)
+                        result = hovered.Placeholder.AddComponent<PathPlaceholder>();
+                    return result;
                 }
             }
             else

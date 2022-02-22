@@ -45,7 +45,7 @@ namespace _Project.Scripts.Grid
             var ps = Cells[gridPos.x, gridPos.y].Placeholder
                 .AddComponent<T>();
             ps.placeableSprite = template.placeableSprite;
-            
+
             Cells[gridPos.x, gridPos.y].Place(ps);
         }
 

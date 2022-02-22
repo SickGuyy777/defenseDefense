@@ -10,11 +10,15 @@ namespace _Project.Scripts.Grid.Placeholders
         [Readonly]
         private PathGrid grid;
 
+        // ReSharper disable once IntroduceOptionalParameters.Global
+        public new void Initialize(PathCell cell) { Initialize(cell, true); }
+
         /// <summary>
         /// Initialize the placeholder with <paramref name="cell"/>.
         /// </summary>
         /// <param name="cell">The reference <see cref="HoverableCell"/>.</param>
-        public new void Initialize(PathCell cell)
+        /// <param name="setParent">Set this placeholder as a child of the parent grid?</param>
+        public void Initialize(PathCell cell, bool setParent)
         {
             // Assert if the cell is null
             if (cell == null)
@@ -33,7 +37,7 @@ namespace _Project.Scripts.Grid.Placeholders
             transform.localScale = new Vector2(grid.HorizontalSpacing, grid.VerticalSpacing);
 
             // Set as child of the grid
-            transform.SetParent(cell.Parent.transform);
+            if (setParent) transform.SetParent(cell.Parent.transform);
         }
 
         /// <summary>
@@ -59,6 +63,14 @@ namespace _Project.Scripts.Grid.Placeholders
             go.SetActive(true);
 
             return placeholder;
+        }
+
+        public void CopyFromCell(PathCell cell)
+        {
+            if (cell == null) return;
+
+            Cell ??= cell;
+            Cell.Rotate(cell.CurrentDir);
         }
     }
 }

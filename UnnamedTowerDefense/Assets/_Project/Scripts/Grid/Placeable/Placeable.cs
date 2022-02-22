@@ -9,7 +9,7 @@ namespace _Project.Scripts.Grid
         where TPlaceholder : CellPlaceholder<TCell, TGrid, TPlaceholder>
     {
         public SpriteRenderer Renderer { get; private set; }
-        protected TCell Cell { get; private set; }
+        public TCell Cell { get; private set; }
         
         public Sprite placeableSprite;
 
