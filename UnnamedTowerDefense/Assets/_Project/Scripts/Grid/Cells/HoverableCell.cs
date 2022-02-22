@@ -36,9 +36,15 @@ namespace _Project.Scripts.Grid
 
                 _isHovered = value;
                 Placeholder.SetAlpha(value ? 0.5f : 0f);
-                
+
                 if (value)
+                {
                     OnHover?.Invoke();
+
+                    // Reset position
+                    Vector3 eulerAngles = Placeholder.transform.eulerAngles;
+                    Placeholder.transform.localRotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y, 0);
+                }
                 else
                     OnStopHover?.Invoke();
             }

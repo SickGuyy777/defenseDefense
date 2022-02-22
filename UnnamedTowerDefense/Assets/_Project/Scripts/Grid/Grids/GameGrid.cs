@@ -116,6 +116,12 @@ namespace _Project.Scripts.Grid
             HoverableCell lastHovered = lastHoveredCell;
             HoverableCell hovered = GetClosest(Mouse.Position);
             SelectCell(hovered);
+
+            if (switchPathMode)
+            {
+                hovered.StopHover();
+                hovered.Hover();
+            }
             
             if (hovered == null)
                 return;
@@ -142,7 +148,9 @@ namespace _Project.Scripts.Grid
                 {
                     if (notSamePlaced)
                     {
-                        pathGrid.Place(gridPos, pathPrefabs[pathIndex].Preafb);
+                        placeableGrid.Cells[gridPos.x, gridPos.y].Release();
+                        pathGrid.Place(gridPos, pathPrefabs[pathIndex].Preafb); 
+                        
                         pathGrid.Cells[gridPos.x, gridPos.y].Placeholder.CopyFromCell(draggedPath);
                     }
                     else
@@ -162,14 +170,18 @@ namespace _Project.Scripts.Grid
             {
                 var placed = placeableGrid.Cells[gridPos.x, gridPos.y].Placed;
                 notSamePlaced = !placed || placed.PlaceableSprite != spritePrefabs[objIndex].Prefab.PlaceableSprite;
+                
                 if (Input.GetMouseButtonDown(0))
                 {
                     if (notSamePlaced)
+                    {
+                        pathGrid.Cells[gridPos.x, gridPos.y].Release();
                         placeableGrid.Place(gridPos, spritePrefabs[objIndex].Prefab);
+                    }
                     else
                         placeableGrid.Release(gridPos);
                 }
-            
+                
                 if (hovered != lastHovered || switchPrefab) return;
             }
             
