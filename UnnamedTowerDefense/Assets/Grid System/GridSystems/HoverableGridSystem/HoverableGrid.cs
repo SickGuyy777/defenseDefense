@@ -5,7 +5,7 @@ namespace Grid_System
     public class HoverableGrid : Grid<HoverableCell, HoverableCellObject, HoverableCellProperties, HoverableGrid>
     {
         public Vector2 CellScale { get; private set; }
-
+        
         private void Awake()
         {
             UpdateGridProperties();
@@ -18,6 +18,10 @@ namespace Grid_System
         private HoverableCellProperties hoverableCellProperties;
         public Vector2Int LastSelectedPosition { get; private set; } = -Vector2Int.one;
 
+        public bool HasSelectedCell => LastSelectedPosition.x >= 0;
+
+        public HoverableCell LastSelectedCell => HasSelectedCell ? this[LastSelectedPosition] : null;
+
         private void Update()
         {
             if (Camera.main == null) return;
@@ -26,16 +30,14 @@ namespace Grid_System
             HoverableCell selected = FromWorldPosition(mousePosition);
             if (selected == null || LastSelectedPosition == selected.GridPosition)
             {
-                if (selected != null || LastSelectedPosition.x < 0) return;
+                if (selected != null || !HasSelectedCell) return;
 
-                Cells[LastSelectedPosition.x, LastSelectedPosition.y].StopHover();
+                this[LastSelectedPosition].StopHover();
                 LastSelectedPosition = -Vector2Int.one;
                 return;
             }
             
-            // Basically is the lastSelectedPosition an actual cell
-            if (LastSelectedPosition.x >= 0)
-                Cells[LastSelectedPosition.x, LastSelectedPosition.y].StopHover();
+            if (HasSelectedCell) this[LastSelectedPosition].StopHover();
 
             selected.Properties = hoverableCellProperties;
             LastSelectedPosition = selected.GridPosition;
@@ -47,7 +49,7 @@ namespace Grid_System
             hoverableCellProperties.Rotate();
 
             if (LastSelectedPosition.x >= 0)
-                Cells[LastSelectedPosition.x, LastSelectedPosition.y].Properties = hoverableCellProperties;
+                this[LastSelectedPosition].Properties = hoverableCellProperties;
         }
 
         public void Hover(Vector2Int cellIndex) => Hover(cellIndex.x, cellIndex.y);

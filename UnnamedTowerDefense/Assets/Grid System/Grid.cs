@@ -38,9 +38,6 @@ namespace Grid_System
             UpdateGridProperties();
             Cells = new TCell[width, height];
 
-            TCell InstantiateCell(Vector2Int gridPosition) =>
-                (TCell)Activator.CreateInstance(typeof(TCell), this, gridPosition);
-
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
@@ -50,6 +47,9 @@ namespace Grid_System
             }
         }
 
+        protected virtual TCell InstantiateCell(Vector2Int gridPosition) =>
+                (TCell)Activator.CreateInstance(typeof(TCell), this, gridPosition);
+        
         protected virtual void UpdateGridProperties()
         {
             Camera cam = Camera.main;
@@ -82,6 +82,7 @@ namespace Grid_System
 
     
         // Indexer for cells
+        public TCell this[Vector2Int gridPosition] => this[gridPosition.x, gridPosition.y];
         public TCell this[int i, int j]
         {
             get

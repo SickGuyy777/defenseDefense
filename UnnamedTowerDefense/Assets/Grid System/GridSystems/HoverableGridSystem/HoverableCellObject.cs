@@ -44,14 +44,14 @@ namespace Grid_System
             // Reset sprite color
             Color c = Renderer.color;
             Renderer.color = new Color(c.r, c.g, c.b, 0f);
-
-            transform.localScale = Cell.Parent.CellScale;
         }
 
         protected override void OnInitialize()
         {
             transform.position = Cell.WorldPosition;
             transform.SetParent(Cell.Parent.transform);
+            
+            transform.localScale = Cell.Parent.CellScale;
             
             Cell.OnHover += OnHover;
             Cell.OnStopHover += OnStopHover;
