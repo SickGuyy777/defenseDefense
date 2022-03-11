@@ -12,4 +12,61 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf86cc1fc6f343d5a6d0260c094f7f02, type: 3}
   m_Name: Path Setup
   m_EditorClassIdentifier: 
-  data: 
+  data: 'loc Curved
+
+    plc 3,3 rs2
+
+    loc Straight
+
+    plc 3,4 rs3
+
+    plc
+    3,5 rs3
+
+    loc Curved
+
+    plc 3,6 rs1
+
+    loc Straight
+
+    plc 4,3 rs2
+
+    loc
+    Curved
+
+    plc 4,4 rs2
+
+    plc 4,5 rs1
+
+    loc Straight
+
+    plc 4,6 rs0
+
+    plc
+    5,3 rs2
+
+    loc Curved
+
+    plc 5,4 rs3
+
+    plc 5,5 rs0
+
+    loc Straight
+
+    plc
+    5,6 rs0
+
+    loc Curved
+
+    plc 6,3 rs3
+
+    loc Straight
+
+    plc 6,4 rs1
+
+    plc
+    6,5 rs1
+
+    loc Curved
+
+    plc 6,6 rs0'

@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace Grid_System.GridSystems.PathGridSystem
@@ -7,19 +8,29 @@ namespace Grid_System.GridSystems.PathGridSystem
     {
         [SerializeField] [TextArea(15, 20)] private string data;
 
+        private const string CurrentDirectory = "Assets/Scripts/Grid System/GridSystems/PathGridSystem/Placeables/";
+        
         public void FromGrid(PathGrid template)
         {
+            if (template.Cells == null) return;
             data = string.Empty;
 
+            PathPlaceable lastPlaceable = null;
             foreach (PathCell cell in template.Cells)
             {
                 if (!cell.IsPlaced) continue;
 
+                if (lastPlaceable != cell.Placed)
+                {
+                    data += $"loc {cell.Placed!.PlaceableName}\n";
+                    lastPlaceable = cell.Placed;
+                }
+                
                 Vector2Int pos = cell.GridPosition;
-                data += $"{pos.x},{pos.y} {cell.Properties.ToString()}\n";
+                data += $"plc {pos.x},{pos.y} {cell.Properties}\n";
             }
-
-            data = data[..^1];
+            
+            data = data != string.Empty ? data[..^1] : data;
         }
         
         public void SetToGrid(ref PathGrid grid)
@@ -28,17 +39,36 @@ namespace Grid_System.GridSystems.PathGridSystem
             
 
             string[] lines = data.Split('\n');
+            PathPlaceable placeable = null;
+            
             foreach (string line in lines)
             {
                 if (line.Length == 0) continue; // Skip blank lines
-                
-                Vector2Int pos = GetPos(line);
-                grid.Place(pos);
 
-                string propertiesString = line[(line.IndexOf(' ') + 1)..];
-                PathCellProperties properties = PathCellProperties.FromString(propertiesString);
+                string[] tokens = line.Split(' ');
+                string command = tokens[0];
+
+                if (command == "plc")
+                {
+                    string lineData = tokens[1] + " " + tokens[2];
+                    Vector2Int pos = GetPos(lineData);
+                    
+                    grid[pos].Place(placeable);
+
+                    string propertiesString = lineData[(lineData.IndexOf(' ') + 1)..];
+                    PathCellProperties properties = PathCellProperties.FromString(propertiesString);
                 
-                grid[pos].Properties = properties;
+                    grid[pos].Properties = properties;
+                }
+                else if (command == "loc")
+                {
+                    string placeableName = tokens[1];
+                    placeableName += ".prefab";
+
+                    string path = CurrentDirectory + placeableName;
+
+                    placeable = AssetDatabase.LoadAssetAtPath<GameObject>(path).GetComponent<PathPlaceable>();
+                }
             }
             
 

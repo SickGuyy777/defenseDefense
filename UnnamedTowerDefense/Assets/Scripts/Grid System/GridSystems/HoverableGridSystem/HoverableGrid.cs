@@ -10,6 +10,8 @@ namespace Grid_System
         public CellEvent OnHover;
         public CellEvent OnStopHover;
 
+        private bool forceUpdate;
+        
         private void Awake()
         {
             UpdateGridProperties();
@@ -46,7 +48,7 @@ namespace Grid_System
             
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             HoverableCell selected = FromWorldPosition(mousePosition);
-            if (selected == null || LastSelectedPosition == selected.GridPosition)
+            if ((selected == null || LastSelectedPosition == selected.GridPosition) && !forceUpdate)
             {
                 if (selected != null || !HasSelectedCell) return;
 
@@ -57,9 +59,12 @@ namespace Grid_System
             
             if (HasSelectedCell) this[LastSelectedPosition].StopHover();
 
+            if (selected == null) return;
             selected.Properties = HoverableCellProperties;
             LastSelectedPosition = selected.GridPosition;
             selected.Hover();
+
+            forceUpdate = false;
         }
 
         public void RotateCell()
@@ -69,6 +74,8 @@ namespace Grid_System
             if (LastSelectedPosition.x >= 0)
                 this[LastSelectedPosition].Properties = HoverableCellProperties;
         }
+
+        public void ForceUpdate() => forceUpdate = true;
 
         public void Hover(Vector2Int cellIndex) => Hover(cellIndex.x, cellIndex.y);
         public void Hover(int x, int y)

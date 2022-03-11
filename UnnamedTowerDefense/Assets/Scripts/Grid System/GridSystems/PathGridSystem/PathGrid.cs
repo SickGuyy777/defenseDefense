@@ -1,11 +1,11 @@
+using Attributes;
 using UnityEngine;
 
 namespace Grid_System.GridSystems.PathGridSystem
 {
     public class PathGrid : Grid<PathCell, PathCellObject, PathCellProperties, PathGrid>
     {
-        [SerializeField] private Sprite placeableSprite;
-        public Sprite Placeable => placeableSprite;
+        [Readonly] public PathPlaceable placeable;
 
         public Vector2 CellScale { get; private set; }
 
@@ -39,7 +39,7 @@ namespace Grid_System.GridSystems.PathGridSystem
         public void Place(int xPos, int yPos)
         {
             CheckCellPosition(xPos, yPos);
-            Cells[xPos, yPos].Place(Placeable);
+            Cells[xPos, yPos].Place(placeable);
         }
 
         public void Remove(Vector2Int gridPosition) => Remove(gridPosition.x, gridPosition.y);

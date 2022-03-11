@@ -183,7 +183,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 10
   height: 10
-  pathSprite: {fileID: 21300000, guid: e748dc04217a243abbfd867d495b20e4, type: 3}
+  placeables:
+  - {fileID: -7434246126667683988, guid: aab0ab37900c547639359e27c90c3e58, type: 3}
+  - {fileID: -2089338157751150705, guid: e7607b5f977c24240a566e7595c88e04, type: 3}
   setup: {fileID: 11400000, guid: 3d5fc9d5f54f74c64a65db2ce444e6b6, type: 2}
 --- !u!114 &245483861
 MonoBehaviour:
@@ -197,7 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd87734ea01d48a4aa2f4e8a6ca74972, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  placeableSprite: {fileID: 21300000, guid: e748dc04217a243abbfd867d495b20e4, type: 3}
+  placeable: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

@@ -42,7 +42,7 @@ namespace Grid_System
             set
             {
                 if (value == _rotationState) return;
-                if (value is > 1 or < 0)
+                if (value is < 0 or > 3)
                     throw new IndexOutOfRangeException("Rotation state is out of range.");
 
                 int oldRot = _rotationState;

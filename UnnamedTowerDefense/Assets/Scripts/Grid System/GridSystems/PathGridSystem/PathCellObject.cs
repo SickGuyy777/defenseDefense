@@ -20,7 +20,7 @@ namespace Grid_System.GridSystems.PathGridSystem
             Cell.OnRemove += OnRemove;
         }
 
-        private void OnPlace(Sprite sprite) => Renderer.sprite = sprite;
+        private void OnPlace(PathPlaceable placeable) => Renderer.sprite = placeable;
         private void OnRemove() => Renderer.sprite = null;
     }
 }

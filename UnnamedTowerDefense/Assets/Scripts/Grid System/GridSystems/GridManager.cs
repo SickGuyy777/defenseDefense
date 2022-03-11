@@ -14,8 +14,25 @@ namespace Grid_System.GridSystems
         private HoverableGrid hoverableGrid;
         private PathGrid pathGrid;
 
-        [SerializeField] private Sprite pathSprite;
+        [SerializeField] private PathPlaceable[] placeables;
         [SerializeField] private PathSetup setup;
+
+        private int _placeableIndex;
+        public int PlaceableIndex
+        {
+            get => _placeableIndex;
+            set
+            {
+                if (value == _placeableIndex) return;
+
+                _placeableIndex = value;
+                
+                pathGrid.placeable = placeables[_placeableIndex];
+                
+                HoverableGridInit(false);
+                hoverableGrid.ForceUpdate();
+            }
+        }
         
         private void Awake()
         {
@@ -34,6 +51,10 @@ namespace Grid_System.GridSystems
             hoverableGrid.Initialize();
             HoverableGridInit();
             
+            _placeableIndex = -1;
+            PlaceableIndex = 0;
+            
+            // Load twice because loading rotation works only with that ¯\_(ツ)_/¯
             LoadPathSetup();
             LoadPathSetup();
         }
@@ -45,20 +66,29 @@ namespace Grid_System.GridSystems
 
             if (Input.GetKeyDown(KeyCode.S)) SavePathSetup();
             else if (Input.GetKeyDown(KeyCode.L)) LoadPathSetup();
+            else if (Input.GetKeyDown(KeyCode.F))
+            {
+                int newIndex = PlaceableIndex + 1;
+                if (newIndex >= placeables.Length) newIndex = 0;
+
+                PlaceableIndex = newIndex;
+            }
         }
 
-        private void HoverableGridInit()
+        private void HoverableGridInit(bool subscribeToEvents = true)
         {
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
                 {
-                    hoverableGrid[i, j].CellObject.Sprite = pathSprite;
+                    hoverableGrid[i, j].CellObject.Sprite = placeables[PlaceableIndex];
 
                     // Reset color
                     hoverableGrid[i, j].CellObject.SetAlpha(0f);
                 }
             }
+            
+            if (!subscribeToEvents) return;
             
             hoverableGrid.OnRotate += OnRotate;
             hoverableGrid.OnHover += OnHover;
@@ -73,22 +103,38 @@ namespace Grid_System.GridSystems
             cell.CellObject.transform.localRotation = Quaternion.Euler(rot.x, rot.y, cell.RotationState * 90);
 
             Vector2 newScale = pathGrid.CellScale;
-            if (cell.RotationState == 1)
+            if (cell.RotationState is 1 or 3)
                 newScale = new Vector2(newScale.y, newScale.x);
 
             cell.CellObject.transform.localScale = newScale;
         }
 
-        private static void OnRotate(HoverableCell cell)
+        private void OnRotate(HoverableCell cell)
         {
+            int rotationSource = cell.RotationState;
+            if (PlaceableIndex == 0 && cell.RotationState > 1) rotationSource -= 2;
+
             Vector3 rot = cell.CellObject.transform.eulerAngles;
-            cell.CellObject.transform.localRotation = Quaternion.Euler(rot.x, rot.y, cell.RotationState * 90);
+            cell.CellObject.transform.localRotation = Quaternion.Euler(rot.x, rot.y, rotationSource * 90);
             
-            Vector2 oldRot = cell.CellObject.transform.localScale;
-            cell.CellObject.transform.localScale = new Vector2(oldRot.y, oldRot.x);
+            Vector2 newScale = hoverableGrid.CellScale;
+            if (cell.RotationState is 1 or 3)
+                newScale = new Vector2(newScale.y, newScale.x);
+
+            cell.CellObject.transform.localScale = newScale;
         }
 
-        private static void OnHover(HoverableCell cell) => cell.CellObject.SetAlpha(0.5f);
+        private void OnHover(HoverableCell cell)
+        {
+            cell.CellObject.SetAlpha(0.5f);
+            
+            Vector2 newScale = hoverableGrid.CellScale;
+            if (hoverableGrid.HoverableCellProperties.RotationState is 1 or 3)
+                newScale = new Vector2(newScale.y, newScale.x);
+
+            cell.CellObject.transform.localScale = newScale;
+        }
+
         private static void OnStopHover(HoverableCell cell) => cell.CellObject.SetAlpha(0f);
 
         private void HoveredGridUpdate()
@@ -107,7 +153,7 @@ namespace Grid_System.GridSystems
             else
             {
                 selectedPath.Properties = GetPathProperties();
-                selectedPath.Place(pathGrid.Placeable);
+                selectedPath.Place(pathGrid.placeable);
             }
         }
 
@@ -123,7 +169,6 @@ namespace Grid_System.GridSystems
         public void LoadPathSetup()
         {
             setup.SetToGrid(ref pathGrid);
-            
             PathGridInit();
         }
 

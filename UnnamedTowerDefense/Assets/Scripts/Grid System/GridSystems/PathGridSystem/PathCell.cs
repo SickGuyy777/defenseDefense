@@ -4,12 +4,12 @@ namespace Grid_System.GridSystems.PathGridSystem
 {
     public class PathCell : Cell<PathGrid, PathCellObject, PathCellProperties, PathCell>, IRotatable
     {
-        public Sprite Placed { get; private set; }
+        public PathPlaceable Placed { get; private set; }
         public bool IsPlaced => Placed != null;
 
         public PathCell(PathGrid parent, Vector2Int gridPosition) : base(parent, gridPosition) {}
 
-        public delegate void PlaceEvent(Sprite sprite);
+        public delegate void PlaceEvent(PathPlaceable placeable);
         public event PlaceEvent OnPlace;
 
         public delegate void RemoveEvent();
@@ -21,7 +21,7 @@ namespace Grid_System.GridSystems.PathGridSystem
         protected override bool CheckProperties(PathCellProperties other) =>
             other.RotationState == RotationState;
 
-        public void Place(Sprite sprite)
+        public void Place(PathPlaceable sprite)
         {
             if (IsPlaced) return;
             Placed = sprite;
@@ -45,7 +45,7 @@ namespace Grid_System.GridSystems.PathGridSystem
             set
             {
                 if (value == _rotationState) return;
-                if (value is > 1 or < 0)
+                if (value is < 0 or > 3)
                     throw new System.IndexOutOfRangeException("Rotation state is out of range.");
 
                 int oldRot = _rotationState;
