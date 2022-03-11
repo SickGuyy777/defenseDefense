@@ -6,16 +6,34 @@ namespace Grid_System
     {
         public Vector2 CellScale { get; private set; }
         
+        public CellEvent OnRotate;
+        public CellEvent OnHover;
+        public CellEvent OnStopHover;
+
         private void Awake()
         {
             UpdateGridProperties();
-            hoverableCellProperties = new HoverableCellProperties();
-            
+            HoverableCellProperties = new HoverableCellProperties();
+
             CellScale = new Vector2(HorizontalSpacing, VerticalSpacing);
         }
 
+        protected override void OnInitialize() => InitializeCells();
 
-        private HoverableCellProperties hoverableCellProperties;
+        private void InitializeCells()
+        {
+            foreach (HoverableCell cell in Cells)
+            {
+                cell.Properties = HoverableCellProperties;
+                
+                cell.OnRotate += (_, _) => OnRotate?.Invoke(cell);
+                cell.OnHover += () => OnHover?.Invoke(cell);
+                cell.OnStopHover += () => OnStopHover?.Invoke(cell);
+            }
+        }
+
+
+        public HoverableCellProperties HoverableCellProperties { get; private set; }
         public Vector2Int LastSelectedPosition { get; private set; } = -Vector2Int.one;
 
         public bool HasSelectedCell => LastSelectedPosition.x >= 0;
@@ -39,17 +57,17 @@ namespace Grid_System
             
             if (HasSelectedCell) this[LastSelectedPosition].StopHover();
 
-            selected.Properties = hoverableCellProperties;
+            selected.Properties = HoverableCellProperties;
             LastSelectedPosition = selected.GridPosition;
             selected.Hover();
         }
 
         public void RotateCell()
         {
-            hoverableCellProperties.Rotate();
+            HoverableCellProperties.Rotate();
 
             if (LastSelectedPosition.x >= 0)
-                this[LastSelectedPosition].Properties = hoverableCellProperties;
+                this[LastSelectedPosition].Properties = HoverableCellProperties;
         }
 
         public void Hover(Vector2Int cellIndex) => Hover(cellIndex.x, cellIndex.y);

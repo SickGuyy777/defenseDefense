@@ -9,38 +9,55 @@ namespace Grid_System
         where TCellProperties : CellProperties<TCell, TThis, TCellObject, TCellProperties>
         where TThis : Grid<TCell, TCellObject, TCellProperties, TThis>
     {
-        [SerializeField] [Range(1, 10)] protected int width;
-        public int Width => width;
+        private int _width;
+        public int Width
+        {
+            get => _width;
+            set
+            {
+                if (value is < 1 or > 10) return;
+                _width = value;
+            }
+        }
 
-        [SerializeField] [Range(1, 10)] protected int height;
-        public int Height => height;
+        private int _height;
+        public int Height
+        {
+            get => _height;
+            set
+            {
+                if (value is < 1 or > 10) return;
+                _height = value;
+            }
+        }
 
         public float HorizontalSpacing { get; protected set; }
         public float VerticalSpacing { get; protected set; }
-        
+
         public float XOffset { get; protected set; }
         public float YOffset { get; protected set; }
-        
-        public TCell[,] Cells { get; protected set; }
-    
-    
-        protected virtual void OnStart() {}
 
-    
-        private void Start()
+        public TCell[,] Cells { get; protected set; }
+
+
+        public delegate void CellEvent(TCell cell);
+        
+        protected virtual void OnInitialize() { }
+
+        public void Initialize()
         {
             InitializeGrid();
-            OnStart();
+            OnInitialize();
         }
 
         protected void InitializeGrid()
         {
             UpdateGridProperties();
-            Cells = new TCell[width, height];
+            Cells = new TCell[Width, Height];
 
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < Width; i++)
             {
-                for (int j = 0; j < height; j++)
+                for (int j = 0; j < Height; j++)
                 {
                     Cells[i, j] = InstantiateCell(new Vector2Int(i, j));
                 }
@@ -48,8 +65,8 @@ namespace Grid_System
         }
 
         protected virtual TCell InstantiateCell(Vector2Int gridPosition) =>
-                (TCell)Activator.CreateInstance(typeof(TCell), this, gridPosition);
-        
+            (TCell) Activator.CreateInstance(typeof(TCell), this, gridPosition);
+
         protected virtual void UpdateGridProperties()
         {
             Camera cam = Camera.main;
@@ -59,19 +76,19 @@ namespace Grid_System
                 return;
             }
 
-            // cam.orthographicSize returns half of the height
+            // cam.orthographicSize returns half of the Height
             float realHeight = cam.orthographicSize * 2;
-            
-            // Multiply the cam.aspect (width/height) by the height to get the width
+
+            // Multiply the cam.aspect (Width/Height) by the Height to get the Width
             float realWidth = cam.aspect * realHeight;
 
             // Update spaces
-            float horizontalSpacing = realWidth / width;
-            float verticalSpacing = realHeight / height;
+            float horizontalSpacing = realWidth / Width;
+            float verticalSpacing = realHeight / Height;
 
             // Update offsets
-            float xOffset = width % 2 == 0 ? horizontalSpacing / 2 : 0;
-            float yOffset = height % 2 == 0 ? verticalSpacing / 2 : 0;
+            float xOffset = Width % 2 == 0 ? horizontalSpacing / 2 : 0;
+            float yOffset = Height % 2 == 0 ? verticalSpacing / 2 : 0;
 
             HorizontalSpacing = horizontalSpacing;
             VerticalSpacing = verticalSpacing;
@@ -80,9 +97,10 @@ namespace Grid_System
             YOffset = yOffset;
         }
 
-    
+
         // Indexer for cells
         public TCell this[Vector2Int gridPosition] => this[gridPosition.x, gridPosition.y];
+
         public TCell this[int i, int j]
         {
             get
@@ -96,42 +114,43 @@ namespace Grid_System
         // Get a cell's position in world position
         public virtual Vector2 ToWorldPosition(Vector2Int gridPosition)
         {
-            float x = (gridPosition.x - width / 2) * HorizontalSpacing + XOffset;
-            float y = (gridPosition.y - height / 2) * VerticalSpacing + YOffset;
+            float x = (gridPosition.x - Width / 2) * HorizontalSpacing + XOffset;
+            float y = (gridPosition.y - Height / 2) * VerticalSpacing + YOffset;
 
             return new Vector2(x, y);
         }
-        
+
         // Get the closest grid position to the given position
         protected virtual TCell FromWorldPosition(Vector2 position)
         {
-            Vector2 distance = position - (Vector2)transform.position;
-            
+            Vector2 distance = position - (Vector2) transform.position;
+
             // Position is out of bounds
-            if (Mathf.Abs(distance.x) > HorizontalSpacing * width / 2 ||
-                Mathf.Abs(distance.y) > VerticalSpacing * height / 2)
+            if (Mathf.Abs(distance.x) > HorizontalSpacing * Width / 2 ||
+                Mathf.Abs(distance.y) > VerticalSpacing * Height / 2)
                 return null;
 
-            float horizontalBound = width / 2f;
-            float verticalBound = height / 2f;
+            float horizontalBound = Width / 2f;
+            float verticalBound = Height / 2f;
 
             float x = position.x / HorizontalSpacing;
             float y = position.y / VerticalSpacing;
-            
-            var gridX = (int)(x + horizontalBound);
-            var gridY = (int)(y + verticalBound);
+
+            var gridX = (int) (x + horizontalBound);
+            var gridY = (int) (y + verticalBound);
 
             // Validate the position
-            bool inBound = gridX < width && gridX >= 0 && gridY < height && gridY >= 0;
+            bool inBound = gridX < Width && gridX >= 0 && gridY < Height && gridY >= 0;
 
             return inBound ? Cells[gridX, gridY] : null;
         }
 
 
         protected bool CheckCellPosition(Vector2Int position) => CheckCellPosition(position.x, position.y);
+
         protected bool CheckCellPosition(int x, int y)
         {
-            if (x < 0 || x >= width || y < 0 || y >= height)
+            if (x < 0 || x >= Width || y < 0 || y >= Height)
                 throw new IndexOutOfRangeException("Position is out of range.");
 
             return true;

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Grid_System.GridSystems.PathGridSystem
@@ -9,6 +8,13 @@ namespace Grid_System.GridSystems.PathGridSystem
         public Sprite Placeable => placeableSprite;
 
         public Vector2 CellScale { get; private set; }
+
+        public event CellEvent OnRotate;
+
+        public delegate void PlaceEvent(PathCell cell, Sprite placed);
+
+        public event PlaceEvent OnPlace;
+        public event CellEvent OnRemove;
         
         private void Awake()
         {
@@ -16,6 +22,17 @@ namespace Grid_System.GridSystems.PathGridSystem
             CellScale = new Vector2(HorizontalSpacing, VerticalSpacing);
         }
 
+        protected override void OnInitialize() => InitializeCells();
+
+        private void InitializeCells()
+        {
+            foreach (PathCell cell in Cells)
+            {
+                cell.OnRotate += (_, _) => OnRotate?.Invoke(cell);
+                cell.OnPlace += (sprite) => OnPlace?.Invoke(cell, sprite);
+                cell.OnRemove += () => OnRemove?.Invoke(cell);
+            }
+        }
 
         public void Place(Vector2Int gridPosition) => Place(gridPosition.x, gridPosition.y);
         public void Place(int xPos, int yPos)

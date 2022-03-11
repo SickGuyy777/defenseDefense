@@ -27,22 +27,15 @@ namespace Grid_System
         }
         
         public delegate void HoverEvent();
-
         public event HoverEvent OnHover;
         public event HoverEvent OnStopHover;
-        
-        
+
         public HoverableCell(HoverableGrid parent, Vector2Int gridPosition) : base(parent, gridPosition) {}
 
         public void Hover() => IsHovered = true;
         public void StopHover() => IsHovered = false;
 
-        private int _rotationState;
-        /// <summary>
-        /// STATE:
-        ///     * 0: Normal rotation
-        ///     * 1: Upwards
-        /// </summary>
+        private int _rotationState = -1;
         public int RotationState
         {
             get => _rotationState;
@@ -51,9 +44,11 @@ namespace Grid_System
                 if (value == _rotationState) return;
                 if (value is > 1 or < 0)
                     throw new IndexOutOfRangeException("Rotation state is out of range.");
-                
-                OnRotate?.Invoke(_rotationState, value);
+
+                int oldRot = _rotationState;
                 _rotationState = value;
+                
+                OnRotate?.Invoke(oldRot, value);
             }
         }
 
@@ -65,13 +60,7 @@ namespace Grid_System
 
         protected override bool CheckProperties([NotNull] HoverableCellProperties other) =>
             other.RotationState == RotationState;
-
-        /// <summary>
-        /// STATE:
-        ///     * 0: Normal rotation
-        ///     * 1: Upwards
-        /// </summary>
-        /// <param name="state"></param>
+        
         public void Rotate(int state) => RotationState = state;
         public event IRotatable.RotateEvent OnRotate;
     }
