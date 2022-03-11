@@ -15,7 +15,8 @@ namespace Grid_System.GridSystems
         private PathGrid pathGrid;
 
         [SerializeField] private Sprite pathSprite;
-
+        [SerializeField] private PathSetup setup;
+        
         private void Awake()
         {
             hoverableGrid = GetComponent<HoverableGrid>();
@@ -31,16 +32,19 @@ namespace Grid_System.GridSystems
         private void Start()
         {
             hoverableGrid.Initialize();
-            pathGrid.Initialize();
-            
             HoverableGridInit();
-            PathGridInit();
+            
+            LoadPathSetup();
+            LoadPathSetup();
         }
 
         private void Update()
         {
             HoveredGridUpdate();
             PathGridUpdate();
+
+            if (Input.GetKeyDown(KeyCode.S)) SavePathSetup();
+            else if (Input.GetKeyDown(KeyCode.L)) LoadPathSetup();
         }
 
         private void HoverableGridInit()
@@ -114,5 +118,15 @@ namespace Grid_System.GridSystems
 
             return newProperties;
         }
+
+
+        public void LoadPathSetup()
+        {
+            setup.SetToGrid(ref pathGrid);
+            
+            PathGridInit();
+        }
+
+        public void SavePathSetup() => setup.FromGrid(pathGrid);
     }
 }

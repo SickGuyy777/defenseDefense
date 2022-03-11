@@ -60,6 +60,8 @@ namespace Grid_System
             go.SetActive(true);
             return cellObject;
         }
+
+        public virtual void Destroy() => Object.Destroy(CellObject.gameObject);
     }
 
     [System.Serializable]
@@ -67,5 +69,8 @@ namespace Grid_System
         where TCell : Cell<TGrid, TCellObject, TThis, TCell>
         where TGrid : Grid<TCell, TCellObject, TThis, TGrid>
         where TCellObject : CellObject<TCell, TGrid, TThis, TCellObject>
-        where TThis : CellProperties<TCell, TGrid, TCellObject, TThis>  { }
+        where TThis : CellProperties<TCell, TGrid, TCellObject, TThis>
+    {
+        public static TThis FromString(string source) => default;
+    }
 }

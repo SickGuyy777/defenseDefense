@@ -57,5 +57,7 @@ namespace Grid_System.GridSystems.PathGridSystem
         public void Rotate(int state) => RotationState = state;
 
         public event IRotatable.RotateEvent OnRotate;
+
+        public override void Destroy() => Object.Destroy(CellObject.gameObject);
     }
 }

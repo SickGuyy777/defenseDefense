@@ -43,9 +43,11 @@ namespace Grid_System
         public delegate void CellEvent(TCell cell);
         
         protected virtual void OnInitialize() { }
-
+        protected virtual void BeforeInitialize() {}
+        
         public void Initialize()
         {
+            BeforeInitialize();
             InitializeGrid();
             OnInitialize();
         }
@@ -154,6 +156,12 @@ namespace Grid_System
                 throw new IndexOutOfRangeException("Position is out of range.");
 
             return true;
+        }
+        
+        protected void DestroyAllCells()
+        {
+            if (Cells == null) return;
+            foreach (TCell cell in Cells) cell.Destroy();
         }
     }
 }

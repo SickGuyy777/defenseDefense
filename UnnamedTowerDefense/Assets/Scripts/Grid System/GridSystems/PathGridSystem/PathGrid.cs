@@ -23,13 +23,14 @@ namespace Grid_System.GridSystems.PathGridSystem
         }
 
         protected override void OnInitialize() => InitializeCells();
+        protected override void BeforeInitialize() => DestroyAllCells();
 
         private void InitializeCells()
         {
             foreach (PathCell cell in Cells)
             {
                 cell.OnRotate += (_, _) => OnRotate?.Invoke(cell);
-                cell.OnPlace += (sprite) => OnPlace?.Invoke(cell, sprite);
+                cell.OnPlace += sprite => OnPlace?.Invoke(cell, sprite);
                 cell.OnRemove += () => OnRemove?.Invoke(cell);
             }
         }

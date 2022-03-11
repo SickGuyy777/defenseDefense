@@ -184,6 +184,7 @@ MonoBehaviour:
   width: 10
   height: 10
   pathSprite: {fileID: 21300000, guid: e748dc04217a243abbfd867d495b20e4, type: 3}
+  setup: {fileID: 11400000, guid: 3d5fc9d5f54f74c64a65db2ce444e6b6, type: 2}
 --- !u!114 &245483861
 MonoBehaviour:
   m_ObjectHideFlags: 0
